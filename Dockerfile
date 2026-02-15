@@ -24,7 +24,7 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 COPY . .
 
 # 收集静态文件
-RUN python message_board/manage.py collectstatic --noinput
+RUN DEBUG=False python message_board/manage.py collectstatic --noinput
 
 # 暴露端口
 EXPOSE 8000
