@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}编辑消息{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-white">
+                    <h1>编辑消息</h1>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- 标题字段 -->
+                        <div class="form-group">
+                            <label for="{{ form.title.id_for_label }}">标题</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.title.errors %}
+                                <small>{{ error }}</small><br>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- 分类字段 -->
+                        <div class="form-group">
+                            <label for="{{ form.category.id_for_label }}">分类</label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.category.errors %}
+                                <small>{{ error }}</small><br>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- 标签字段 -->
+                        <div class="form-group">
+                            <label for="{{ form.tags.id_for_label }}">标签</label>
+                            {{ form.tags }}
+                            <small class="form-text text-muted">按住Ctrl键可选择多个标签</small>
+                            {% if form.tags.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.tags.errors %}
+                                <small>{{ error }}</small><br>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- 内容字段 -->
+                        <div class="form-group">
+                            <label for="{{ form.content.id_for_label }}">内容</label>
+                            {{ form.content }}
+                            {% if form.content.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.content.errors %}
+                                <small>{{ error }}</small><br>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- 提交按钮 -->
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary mr-2">更新</button>
+                            <a href="{% url 'messages:message_detail' message.id %}" class="btn btn-secondary">取消</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 加载CKEditor相关资源 -->
+{{ form.media }}
+{% endblock %}

@@ -1,0 +1,24 @@
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+venv
+.env
+
+# Django
+message_board/db.sqlite3
+message_board/media
+message_board/staticfiles
+
+# Docker
+.dockerignore
+Dockerfile
+.docker-compose.yml
+
+# Other
+.git
+.gitignore
+*.log
+*.tmp
+*~

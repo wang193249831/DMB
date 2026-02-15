@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}个人资料 - Django消息发布平台{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">个人资料</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-3 text-center">
+                            {% if user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}的头像" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                            {% else %}
+                                <div class="rounded-circle bg-gray-300 d-flex align-items-center justify-content-center" style="width: 150px; height: 150px;">
+                                    <span class="text-gray-500 fs-3">{{ user.username|first|upper }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-9">
+                            <h4>{{ user.username }}</h4>
+                            <p class="text-muted">{{ user.email }}</p>
+                            <p>{{ user.profile.bio|default:'暂无个人简介' }}</p>
+                            {% if user.profile.website %}
+                                <p><a href="{{ user.profile.website }}" target="_blank">{{ user.profile.website }}</a></p>
+                            {% endif %}
+                            <p class="text-muted small">注册时间: {{ user.date_joined|date:"Y-m-d H:i" }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <h5 class="mb-3">编辑个人资料</h5>
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_avatar" class="form-label">头像</label>
+                            {{ form.avatar }}
+                            {% if form.avatar.errors %}
+                                <div class="text-danger mt-1">{{ form.avatar.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_bio" class="form-label">个人简介</label>
+                            {{ form.bio }}
+                            {% if form.bio.errors %}
+                                <div class="text-danger mt-1">{{ form.bio.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_website" class="form-label">网站</label>
+                            {{ form.website }}
+                            {% if form.website.errors %}
+                                <div class="text-danger mt-1">{{ form.website.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="btn btn-primary">保存更改</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        // 为表单字段添加Bootstrap样式
+        document.addEventListener('DOMContentLoaded', function() {
+            const textInputs = document.querySelectorAll('input[type="url"]');
+            const textAreas = document.querySelectorAll('textarea');
+            const fileInputs = document.querySelectorAll('input[type="file"]');
+
+            textInputs.forEach(input => {
+                input.classList.add('form-control');
+            });
+
+            textAreas.forEach(textarea => {
+                textarea.classList.add('form-control');
+            });
+
+            fileInputs.forEach(input => {
+                input.classList.add('form-control');
+            });
+        });
+    </script>
+{% endblock %}

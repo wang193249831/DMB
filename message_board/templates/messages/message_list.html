@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}消息列表{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="text-center mb-5">消息列表</h1>
+
+            <!-- 搜索和筛选区域 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="form-inline">
+                        <div class="form-group mr-2">
+                            <input type="text" name="search" class="form-control" placeholder="搜索消息..." value="{{ request.GET.search }}">
+                        </div>
+                        <div class="form-group mr-2">
+                            <select name="category" class="form-control">
+                                <option value="">所有分类</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:'i' %}selected{% endif %}>{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">搜索</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 创建消息按钮 -->
+            {% if user.is_authenticated %}
+            <div class="text-right mb-3">
+                <a href="{% url 'message_board_messages:message_create' %}" class="btn btn-success">创建新消息</a>
+            </div>
+            {% endif %}
+
+            <!-- 消息列表 -->
+            {% if messages_list %}
+            <div class="list-group">
+                {% for message in messages_list %}
+                <div class="list-group-item list-group-item-action mb-3 rounded-lg shadow-sm hover:shadow transition-shadow duration-300">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1"><a href="{% url 'message_board_messages:message_detail' message.id %}" class="text-decoration-none text-primary">{{ message.title }}</a></h5>
+                        <small class="text-muted">{{ message.created_at|date:"Y-m-d H:i" }}</small>
+                    </div>
+                    <p class="mb-2 text-muted">{{ message.content|striptags|truncatechars:100 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ message.author.profile.avatar.url }}" alt="{{ message.author.username }}" class="rounded-circle mr-2" style="width: 30px; height: 30px;">
+                            <span class="text-sm">{{ message.author.username }}</span>
+                        </div>
+                        <div class="d-flex">
+                            <span class="badge badge-primary mr-2">{{ message.category.name }}</span>
+                            {% for tag in message.tags.all %}
+                            <span class="badge badge-secondary mr-1">{{ tag.name }}</span>
+                            {% endfor %}
+                            <span class="ml-2 text-muted"><i class="far fa-thumbs-up"></i> {{ message.likes.count }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- 分页 -->
+            <nav aria-label="Page navigation mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if messages_list.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="{% url 'message_board_messages:message_list' %}?page={{ messages_list.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% for i in messages_list.paginator.page_range %}
+                    {% if messages_list.number == i %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                    {% else %}
+                    <li class="page-item"><a class="page-link" href="{% url 'message_board_messages:message_list' %}?page={{ i }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">{{ i }}</a></li>
+                    {% endif %}
+                    {% endfor %}
+                    {% if messages_list.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{% url 'message_board_messages:message_list' %}?page={{ messages_list.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                没有找到相关消息
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

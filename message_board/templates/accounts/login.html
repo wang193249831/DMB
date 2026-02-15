@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}登录 - Django消息发布平台{% endblock %}
+
+{% block content %}
+    <div class="auth-container">
+        <div class="auth-card">
+            <h3>用户登录</h3>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="id_username">用户名</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="error-message">{{ form.username.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_password">密码</label>
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                                <div class="error-message">{{ form.password.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="remember-me">
+                            {{ form.remember }}<label for="id_remember">记住我</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100" style="margin-top: 20px;">登录</button>
+                    </form>
+            </div>
+            <div class="auth-footer">
+                <p>还没有账号？<a href="{% url 'accounts:register' %}" class="highlight-link">立即注册</a></p>
+            </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        // 为表单字段添加Bootstrap样式
+        document.addEventListener('DOMContentLoaded', function() {
+            const formFields = document.querySelectorAll('input[type="text"], input[type="password"]');
+            const checkBox = document.querySelector('input[type="checkbox"]');
+            formFields.forEach(field => {
+                field.classList.add('form-control');
+            });
+            // 添加错误处理，防止找不到复选框时抛出错误
+            if (checkBox) {
+                checkBox.classList.add('form-check-input');
+            }
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}首页 - Django消息发布平台{% endblock %}
+
+{% block content %}
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1>欢迎来到<span class="highlight">Django消息发布平台</span></h1>
+            <p class="subtext">这是一个基于Django框架开发的现代化消息发布平台，您可以在这里发布消息、参与讨论。</p>
+            {% if user.is_authenticated %}
+                <a class="btn btn-primary" href="{% url 'message_board_messages:message_create' %}">发布消息</a>
+            {% else %}
+                <div class="button-group">
+                    <a class="btn btn-primary" href="{% url 'accounts:login' %}">登录</a>
+                    <a class="btn btn-outline" href="{% url 'accounts:register' %}">注册</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>最新消息</h2>
+        {% if latest_messages %}
+            <div class="row">
+                {% for message in latest_messages %}
+                    <div class="col-md-4 mb-4">
+                        <div class="message-card h-100">
+                            {% if message.image %}<img src="{{ message.image.url }}" class="card-img-top" alt="{{ message.title }}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px 8px 0 0;">{% endif %}
+                            <div class="card-body">
+                                <span class="category-badge float-end">{{ message.category.name }}</span>
+                                <h5 class="card-title">{{ message.title }}</h5>
+                                <p class="text-muted small">作者: {{ message.author.username }} | 发布时间: {{ message.created_at|date:"Y-m-d H:i" }}</p>
+                                <p>{{ message.content|truncatechars:100 }}</p>
+                                <div class="mt-2">
+                                    {% for tag in message.tags.all %}
+                                        <span class="tag">{{ tag.name }}</span>
+                                    {% endfor %}
+                                </div>
+                                <a href="{% url 'message_board_messages:message_detail' message.id %}" class="btn btn-outline mt-3">查看详情</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="info-box">
+                暂无消息，请稍后再来查看。
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

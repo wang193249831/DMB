@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}注册 - Django消息发布平台{% endblock %}
+
+{% block content %}
+    <div class="auth-container">
+        <div class="auth-card">
+            <h3>用户注册</h3>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="id_username">用户名</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="error-message">{{ form.username.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="id_password1">密码</label>
+                    <div class="password-input-group">
+                        {{ form.password1 }}
+                        <button type="button" class="toggle-password" data-target="id_password1">
+                            <i class="fas fa-eye-slash"></i>
+                        </button>
+                    </div>
+                    {% if form.password1.errors %}
+                        <div class="error-message">{{ form.password1.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="id_password2">确认密码</label>
+                    <div class="password-input-group">
+                        {{ form.password2 }}
+                        <button type="button" class="toggle-password" data-target="id_password2">
+                            <i class="fas fa-eye-slash"></i>
+                        </button>
+                    </div>
+                    {% if form.password2.errors %}
+                        <div class="error-message">{{ form.password2.errors }}</div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary w-100" style="margin-top: 20px;">注册</button>
+            </form>
+            <div class="auth-footer">
+                <p>已有账号？<a href="{% url 'accounts:login' %}" class="highlight-link">立即登录</a></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 为表单字段添加样式
+            const formFields = document.querySelectorAll('input[type="text"], input[type="password"]');
+            formFields.forEach(field => {
+                field.classList.add('form-control');
+            });
+        });
+    </script>
+{% endblock %}

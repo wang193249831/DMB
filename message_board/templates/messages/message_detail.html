@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ message.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <!-- 消息详情卡片 -->
+            <div class="message-card">
+                <h1>{{ message.title }}</h1>
+                <div class="message-meta">
+                    <span>{{ message.created_at|date:"Y-m-d H:i" }}</span>
+                    <span class="category-badge">{{ message.category.name }}</span>
+                </div>
+                    <!-- 作者信息 -->
+                    <div class="d-flex align-items-center mb-3">
+                        {% if message.author.profile.avatar %}
+                            <img src="{{ message.author.profile.avatar.url }}" alt="{{ message.author.username }}" class="rounded-circle mr-3" style="width: 50px; height: 50px;">
+                        {% else %}
+                            <img src="/static/images/default_avatar.svg" alt="{{ message.author.username }}" class="rounded-circle mr-3" style="width: 50px; height: 50px;">
+                        {% endif %}
+                        <div>
+                            <h5 class="mb-0">{{ message.author.username }}</h5>
+                            <small class="text-muted">{{ message.created_at|date:"Y-m-d H:i" }}</small>
+                        </div>
+                        <!-- 编辑和删除按钮 -->
+                        {% if user == message.author %}
+                        <div class="ml-auto">
+                            <a href="{% url 'message_board_messages:message_edit' message.id %}" class="btn btn-outline mr-2">编辑</a>
+                            <button type="button" class="btn btn-outline" style="color: var(--accent); border-color: var(--accent);" data-bs-toggle="modal" data-bs-target="#deleteModal">删除</button>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 消息标签 -->
+                    <div class="mb-4">
+                        {% for tag in message.tags.all %}
+                        <span class="tag">{{ tag.name }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <!-- 消息内容 -->
+                    <div class="mb-4" id="message-content">
+                        {{ message.content|safe }}
+                    </div>
+
+                    <!-- 点赞和收藏区域 -->
+                    <div class="action-buttons">
+                        {% if user.is_authenticated %}
+                            <button id="like-button" class="action-button" data-message-id="{{ message.id }}">
+                                <i class="far fa-thumbs-up"></i> 点赞 ({{ message.likes }})
+                            </button>
+                        {% else %}
+                            <a href="{% url 'accounts:login' %}?next={% url 'message_board_messages:message_detail' message.id %}" class="action-button">
+                                <i class="far fa-thumbs-up"></i> 点赞 ({{ message.likes }})
+                            </a>
+                        {% endif %}
+                        {% if user.is_authenticated %}
+                            {% if user in message.favorited_by.all %}
+                                <a href="{% url 'message_board_messages:unfavorite_message' message.id %}" class="action-button active">
+                                    <i class="fas fa-heart"></i> 已收藏
+                                </a>
+                            {% else %}
+                                <a href="{% url 'message_board_messages:favorite_message' message.id %}" class="action-button">
+                                    <i class="far fa-heart"></i> 收藏
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'accounts:login' %}" class="action-button">
+                                <i class="far fa-heart"></i> 收藏
+                            </a>
+                        {% endif %}
+                    </div>
+                    <div style="margin-top: 15px; color: var(--text-secondary); font-size: 0.85rem;">
+                        <span><i class="far fa-eye"></i> 浏览量: {{ message.views }}</span>
+                        <span style="margin-left: 15px;"><i class="far fa-bookmark"></i> 收藏数: {{ message.favorited_by.count }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 评论区域 -->
+            <div class="message-card" style="margin-top: 30px;">
+                <h3>评论 ({{ message.comments_count }})</h3>
+                    <!-- 添加评论表单 -->
+                    {% if user.is_authenticated %}
+                        <form action="{% url 'message_board_messages:add_comment' message.id %}" method="post" class="mb-4">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <textarea name="content" rows="3" class="form-control" placeholder="请输入评论内容..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">发布评论</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}?next={% url 'message_board_messages:message_detail' message.id %}" class="btn btn-primary mb-4">登录后评论</a>
+                    {% endif %}
+
+                    <!-- 评论列表 -->
+                    {% if comments %}
+                        {% for comment in comments %}
+                            <div class="comment">
+                                {% if comment.author.profile.avatar %}
+                                    <img src="{{ comment.author.profile.avatar.url }}" alt="{{ comment.author.username }}" class="rounded-circle mr-3" style="width: 40px; height: 40px;">
+                                {% else %}
+                                    <img src="/static/images/default_avatar.svg" alt="{{ comment.author.username }}" class="rounded-circle mr-3" style="width: 40px; height: 40px;">
+                                {% endif %}
+                                <div class="comment-meta">
+                                        <strong>{{ comment.author.username }}</strong> · {{ comment.created_at|date:"Y-m-d H:i" }}
+                                    </div>
+                                    <div class="comment-content">
+                                        {{ comment.content }}
+                                    </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>暂无评论，快来抢沙发吧！</p>
+                    {% endif %}
+                </div>
+                </div>
+            </div>
+
+            <!-- 删除确认模态框 -->
+            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel">确认删除</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            确定要删除这条消息吗？此操作不可撤销。
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                            <form action="{% url 'message_board_messages:message_delete' message.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">删除</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 相关消息 -->
+            <div class="message-card" style="margin-top: 30px;">
+                <h3>相关消息</h3>
+                    {% if related_messages %}
+                    <div class="list-group">
+                        {% for related_message in related_messages %}
+                        <a href="{% url 'message_board_messages:message_detail' related_message.id %}" style="text-decoration: none; color: var(--text-primary); display: block; padding: 12px 0; border-bottom: 1px solid var(--border);">
+                            <h6 style="margin: 0;">{{ related_message.title }}</h6>
+                            <small style="color: var(--text-secondary);">{{ related_message.created_at|date:"Y-m-d" }}</small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-center text-muted">暂无相关消息</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 添加CSRF令牌 -->
+{% csrf_token %}
+
+<!-- 点赞功能JS -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 只在用户已登录且点赞按钮存在时添加事件监听器
+        {% if user.is_authenticated %}
+            const likeButton = document.getElementById('like-button');
+            if (likeButton) {
+                likeButton.addEventListener('click', function() {
+                    const messageId = this.getAttribute('data-message-id');
+                    // 获取CSRF令牌
+                    const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+                    if (!csrfToken) {
+                        console.error('CSRF令牌未找到');
+                        alert('操作失败，请刷新页面重试');
+                        return;
+                    }
+
+                    fetch(`/messages/${messageId}/like/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: JSON.stringify({})
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('网络请求失败');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.error) {
+                            // 显示错误信息
+                            alert(data.error);
+                        } else if (data.liked) {
+                            likeButton.classList.add('active');
+                            likeButton.innerHTML = '<i class="fas fa-thumbs-up"></i> 点赞 (' + data.likes_count + ')';
+                        } else {
+                            likeButton.classList.remove('active');
+                            likeButton.innerHTML = '<i class="far fa-thumbs-up"></i> 点赞 (' + data.likes_count + ')';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('点赞失败:', error);
+                        alert('点赞失败，请重试');
+                    });
+                });
+            }
+        {% endif %}
+    });
+</script>
+{% endblock %}

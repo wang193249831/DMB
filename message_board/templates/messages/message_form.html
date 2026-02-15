@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}发布消息{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>发布新消息</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary mt-3">发布</button>
+    </form>
+</div>
+{% endblock %}
