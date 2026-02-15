@@ -4,19 +4,7 @@ from django.contrib.auth.models import User
 from django_ckeditor_5.fields import CKEditor5Field
 
 
-class Category(models.Model):
-    """消息分类模型"""
-    name = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(max_length=100, unique=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        verbose_name_plural = '分类'
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return self.name
 
 
 class Tag(models.Model):
@@ -42,7 +30,6 @@ class Message(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique_for_date='published_at', db_index=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='messages')
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='messages', db_index=True)
     tags = models.ManyToManyField(Tag, blank=True, related_name='messages')
     content = CKEditor5Field()
     image = models.ImageField(upload_to='message_images/', blank=True, null=True)

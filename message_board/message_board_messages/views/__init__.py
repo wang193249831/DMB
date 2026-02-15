@@ -12,7 +12,6 @@ from .user_views import (
     favorite_list
 )
 from .category_views import (
-    category_messages,
     tag_messages
 )
 from .notification_views import (
@@ -34,7 +33,6 @@ __all__ = [
     'favorite_message',
     'unfavorite_message',
     'favorite_list',
-    'category_messages',
     'tag_messages',
     'notification_list',
     'notification_detail',

@@ -4,32 +4,44 @@ from django.contrib import messages
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.views.decorators.cache import cache_page
-from ..models import Message, Category, Tag
+from ..models import Message, Tag
 from ..forms import MessageForm
 
 
-@cache_page(60 * 15)  # 缓存15分钟
 def message_list(request):
     """消息列表视图"""
     # 获取所有已发布的消息，使用select_related优化查询
-    messages_list = Message.objects.filter(status='published').select_related('author', 'category').order_by('-published_at')
+    # 先按created_at降序排序，确保所有消息都能正确显示
+    messages_list = Message.objects.filter(status='published').select_related('author').order_by('-created_at')
+    # 打印消息数量，用于调试
+    print(f"Found {messages_list.count()} published messages")
     # 分页，每页显示10条，使用get_page()方法简化分页代码
     paginator = Paginator(messages_list, 10)
     page = request.GET.get('page')
     messages = paginator.get_page(page)  # 自动处理无效页码
-    return render(request, 'messages/message_list.html', {'messages': messages})
+    # 打印分页后消息数量，用于调试
+    print(f"Pagination: page {page}, items: {messages.object_list.count()}")
+    return render(request, 'messages/message_list.html', {'messages_list': messages})
 
 
 def message_detail(request, pk):
     """消息详情视图"""
     # 使用select_related优化查询，减少数据库查询次数
-    message = get_object_or_404(Message.objects.select_related('author', 'category'), pk=pk, status='published')
+    message = get_object_or_404(Message.objects.select_related('author'), pk=pk, status='published')
     # 增加浏览量
     message.increase_views()
     # 获取相关消息，使用select_related优化查询
-    related_messages = Message.objects.filter(
-        category=message.category, status='published'
-    ).select_related('author', 'category').exclude(pk=pk).order_by('-published_at')[:3]
+    # 基于标签相似度获取相关消息
+    if message.tags.exists():
+        # 获取包含相同标签的消息
+        related_messages = Message.objects.filter(
+            tags__in=message.tags.all(), status='published'
+        ).select_related('author').exclude(pk=pk).distinct().order_by('-published_at')[:3]
+    else:
+        # 如果没有标签，获取最新的消息
+        related_messages = Message.objects.filter(
+            status='published'
+        ).select_related('author').exclude(pk=pk).order_by('-published_at')[:3]
     # 获取当前消息的评论，使用select_related优化查询
     from comments.models import Comment
     comments = Comment.objects.filter(message=message).select_related('author').order_by('-created_at')

@@ -1,21 +1,19 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
-from .api import CategoryViewSet, TagViewSet, MessageViewSet, FavoriteViewSet, LikeViewSet
+from .api import TagViewSet, MessageViewSet, FavoriteViewSet, LikeViewSet
 
 # 创建API路由器
 router = DefaultRouter()
-router.register(r'api/categories', CategoryViewSet, basename='category')
-router.register(r'api/tags', TagViewSet, basename='tag')
-router.register(r'api/messages', MessageViewSet, basename='message')
-router.register(r'api/favorites', FavoriteViewSet, basename='favorite')
-router.register(r'api/likes', LikeViewSet, basename='like')
+router.register(r'tags', TagViewSet, basename='tag')
+router.register(r'messages', MessageViewSet, basename='message')
+router.register(r'favorites', FavoriteViewSet, basename='favorite')
+router.register(r'likes', LikeViewSet, basename='like')
 
 app_name = 'message_board_messages'
 
 urlpatterns = [
-    # API路由
-    path('', include(router.urls)),
+    # 常规视图路由
     path('', views.message_list, name='message_list'),
     path('<int:pk>/', views.message_detail, name='message_detail'),
     path('create/', views.message_create, name='message_create'),
@@ -25,7 +23,7 @@ urlpatterns = [
     path('<int:pk>/favorite/', views.favorite_message, name='favorite_message'),
     path('<int:pk>/unfavorite/', views.unfavorite_message, name='unfavorite_message'),
     path('favorites/', views.favorite_list, name='favorite_list'),
-    path('category/<slug:slug>/', views.category_messages, name='category_messages'),
+
     path('tag/<slug:slug>/', views.tag_messages, name='tag_messages'),
     # 通知相关路由
     path('notifications/', views.notification_list, name='notification_list'),
@@ -33,4 +31,6 @@ urlpatterns = [
     path('notifications/mark-all-as-read/', views.mark_all_as_read, name='mark_all_as_read'),
     path('notifications/<int:notification_id>/delete/', views.delete_notification, name='delete_notification'),
     path('notifications/delete-all/', views.delete_all_notifications, name='delete_all_notifications'),
+    # API路由
+    path('api/', include(router.urls)),
 ]

@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     # 第三方应用
     'debug_toolbar',
     'rest_framework',
+    'crispy_forms',
+    'crispy_bootstrap5',
+    'django_ckeditor_5',
     # 本地应用
     'accounts',
     'message_board_messages',
@@ -113,9 +116,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-hans'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -137,6 +140,7 @@ TEMPLATES[0]['DIRS'] = [BASE_DIR / 'templates']
 
 # Crispy forms configuration
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 # Django Debug Toolbar配置
 INTERNAL_IPS = ['127.0.0.1']
@@ -166,3 +170,51 @@ CSP_DEFAULT_SRC = ("'self'",)
 CSP_SCRIPT_SRC = ("'self'", 'https://cdn.jsdelivr.net')
 CSP_STYLE_SRC = ("'self'", 'https://cdn.jsdelivr.net')
 CSP_IMG_SRC = ("'self'", 'data:', 'https://cdn.jsdelivr.net')
+
+# CKEditor 5 配置
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': [
+            'heading', '|',
+            'bold', 'italic', 'underline', 'strikethrough', '|',
+            'bulletedList', 'numberedList', '|',
+            'link', 'image', '|',
+            'alignment', '|',
+            'blockQuote', 'codeBlock', '|',
+            'insertTable', '|',
+            'undo', 'redo'
+        ],
+        'language': 'zh-cn',
+        'image': {
+            'toolbar': [
+                'imageTextAlternative', 'imageTitle',
+                '|', 'imageStyle:alignLeft', 'imageStyle:alignCenter', 'imageStyle:alignRight',
+                '|', 'imageStyle:side', '|',
+                'linkImage'
+            ],
+            'styles': [
+                'full',
+                'side',
+                'alignLeft',
+                'alignCenter',
+                'alignRight'
+            ]
+        },
+        'table': {
+            'contentToolbar': [
+                'tableColumn',
+                'tableRow',
+                'mergeTableCells'
+            ]
+        },
+        'heading': {
+            'options': [
+                {'model': 'paragraph', 'title': '段落', 'class': 'ck-heading_paragraph'},
+                {'model': 'heading1', 'view': 'h1', 'title': '标题 1', 'class': 'ck-heading_heading1'},
+                {'model': 'heading2', 'view': 'h2', 'title': '标题 2', 'class': 'ck-heading_heading2'},
+                {'model': 'heading3', 'view': 'h3', 'title': '标题 3', 'class': 'ck-heading_heading3'},
+                {'model': 'heading4', 'view': 'h4', 'title': '标题 4', 'class': 'ck-heading_heading4'}
+            ]
+        }
+    }
+}

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Message, Category, Tag, Favorite, Like
+from .models import Message, Tag, Favorite, Like
 from django.contrib.auth.models import User
 
 
@@ -10,11 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email']
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    """分类序列化器"""
-    class Meta:
-        model = Category
-        fields = ['id', 'name', 'slug', 'created_at']
+
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -27,13 +23,12 @@ class TagSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     """消息序列化器"""
     author = UserSerializer(read_only=True)
-    category = CategorySerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     
     class Meta:
         model = Message
         fields = [
-            'id', 'title', 'slug', 'author', 'category', 'tags', 'content',
+            'id', 'title', 'slug', 'author', 'tags', 'content',
             'image', 'status', 'views', 'likes', 'comments_count',
             'created_at', 'updated_at', 'published_at'
         ]

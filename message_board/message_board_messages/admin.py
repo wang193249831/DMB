@@ -1,15 +1,10 @@
 from django.contrib import admin
-from .models import Category, Message, Tag
-
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'created_at')
-    prepopulated_fields = {'slug': ('name',)}
+from .models import Message, Tag
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'category', 'status', 'published_at')
-    list_filter = ('status', 'created_at', 'published_at', 'category')
+    list_display = ('title', 'author', 'status', 'published_at')
+    list_filter = ('status', 'created_at', 'published_at')
     search_fields = ('title', 'content')
     prepopulated_fields = {'slug': ('title',)}
     raw_id_fields = ('author',)

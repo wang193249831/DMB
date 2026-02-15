@@ -38,6 +38,8 @@ urlpatterns += [
     path('accounts/', include('accounts.urls')),
     # messages应用
     path('messages/', include('message_board_messages.urls')),
+    # django_ckeditor_5应用
+    path('ckeditor5/', include('django_ckeditor_5.urls')),
     # 处理@vite/client请求，避免404错误
     path('@vite/client', lambda request: HttpResponse('')),
     # comments应用

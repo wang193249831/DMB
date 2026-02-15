@@ -11,7 +11,6 @@
                 <h1>{{ message.title }}</h1>
                 <div class="message-meta">
                     <span>{{ message.created_at|date:"Y-m-d H:i" }}</span>
-                    <span class="category-badge">{{ message.category.name }}</span>
                 </div>
                     <!-- 作者信息 -->
                     <div class="d-flex align-items-center mb-3">
@@ -84,7 +83,7 @@
                 <h3>评论 ({{ message.comments_count }})</h3>
                     <!-- 添加评论表单 -->
                     {% if user.is_authenticated %}
-                        <form action="{% url 'message_board_messages:add_comment' message.id %}" method="post" class="mb-4">
+                        <form action="{% url 'comments:add_comment' message.id %}" method="post" class="mb-4">
                             {% csrf_token %}
                             <div class="form-group">
                                 <textarea name="content" rows="3" class="form-control" placeholder="请输入评论内容..."></textarea>
