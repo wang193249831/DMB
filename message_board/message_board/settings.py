@@ -28,7 +28,7 @@ load_dotenv()
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-#t7qg5$%&amp;*()_+qwertyuiopasdfghjklzxcvbnm')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = ['*']
 
@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # 第三方应用
-    'debug_toolbar',
     'rest_framework',
     'crispy_forms',
     'crispy_bootstrap5',
@@ -53,6 +52,13 @@ INSTALLED_APPS = [
     'comments',
 ]
 
+# 仅在开发环境中启用debug_toolbar
+if DEBUG:
+    try:
+        INSTALLED_APPS.append('debug_toolbar')
+    except:
+        pass
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -61,9 +67,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # Debug Toolbar中间件
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+
+# 仅在开发环境中启用debug_toolbar中间件
+if DEBUG:
+    try:
+        MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+    except:
+        pass
 
 ROOT_URLCONF = 'message_board.urls'
 
