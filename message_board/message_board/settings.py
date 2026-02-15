@@ -52,13 +52,6 @@ INSTALLED_APPS = [
     'comments',
 ]
 
-# 仅在开发环境中启用debug_toolbar
-if DEBUG:
-    try:
-        INSTALLED_APPS.append('debug_toolbar')
-    except:
-        pass
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -68,13 +61,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-# 仅在开发环境中启用debug_toolbar中间件
-if DEBUG:
-    try:
-        MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
-    except:
-        pass
 
 ROOT_URLCONF = 'message_board.urls'
 
@@ -151,9 +137,6 @@ TEMPLATES[0]['DIRS'] = [BASE_DIR / 'templates']
 # Crispy forms configuration
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
-
-# Django Debug Toolbar配置
-INTERNAL_IPS = ['127.0.0.1']
 
 # Django REST Framework配置
 REST_FRAMEWORK = {
