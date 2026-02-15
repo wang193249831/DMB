@@ -1,3 +1,4 @@
+import dj_database_url
 """
 Django settings for message_board project.
 
@@ -24,12 +25,12 @@ load_dotenv()
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-#t7qg5$%&amp;*()_+qwertyuiopasdfghjklzxcvbnm'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-#t7qg5$%&amp;*()_+qwertyuiopasdfghjklzxcvbnm')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -84,15 +85,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'message_board.wsgi.application'
 
 # 配置PostgreSQL数据库
+# Database
+# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'message_board',
-        'USER': 'postgre',
-        'PASSWORD': '193249831',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL')
+    )
 }
 
 # Password validation
