@@ -1,0 +1,34 @@
+# Render配置文件
+# 更多信息请参考 https://render.com/docs/yaml-spec
+
+databases:
+  - name: message_board_db
+    databaseName: message_board
+    user: postgres
+    plan: free
+
+services:
+  - type: web
+    name: django-message-board
+    runtime: python
+    plan: free
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py migrate
+      python manage.py collectstatic --noinput
+    startCommand: gunicorn message_board.wsgi:application
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: message_board_db
+          property: connectionString
+      - key: ALLOWED_HOSTS
+        value: "django-message-board.onrender.com"
+      - key: STATIC_URL
+        value: "/static/"
+      - key: STATIC_ROOT
+        value: "staticfiles"
