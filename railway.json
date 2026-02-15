@@ -2,7 +2,7 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "pip install -r requirements.txt && python message_board/manage.py collectstatic --noinput"
+    "buildCommand": "pip install -r requirements.txt && DEBUG=False python message_board/manage.py collectstatic --noinput"
   },
   "deploy": {
     "startCommand": "python message_board/manage.py migrate && gunicorn message_board.wsgi:application",
